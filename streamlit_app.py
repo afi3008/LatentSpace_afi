@@ -51,21 +51,6 @@ if video_path_1.exists():
 else:
     st.warning(f"Tetramer video not found: {video_path_1}")
 
-video_html = f"""
-<video width="100%" autoplay loop muted playsinline
-    style="background: transparent;">
-    <source src="data:video/mp4;base64,{video_base64}" type="video/webm">
-    Your browser does not support this video.
-</video>
-"""
-
-video_html_1 = f"""
-<video width="100%" autoplay loop muted playsinline
-    style="background: transparent;">
-    <source src="data:video/mp4;base64,{video_base64_1}" type="video/webm">
-    Your browser does not support this video.
-</video>
-"""
 
 with left_col:
     components.html(video_html, height=280)
