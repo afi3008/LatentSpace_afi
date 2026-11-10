@@ -1,0 +1,29 @@
+{
+  "method": "Gaussian spatial low-pass",
+  "sigma_pixels": 1.5,
+  "sigma_angstrom": 1.9499999284744263,
+  "boundary": "reflect",
+  "pixel_size_angstrom": 1.2999999523162842,
+  "particle_shape": [
+    4000,
+    256,
+    256
+  ],
+  "noise_shape": [
+    1314,
+    256,
+    256
+  ],
+  "sources": {
+    "particles": "/Users/anna-lena/Desktop/work/phd_courses/ml4ls/LatentSpace_data/tam_dimer_tetramer/batch_0_restacked.mrc",
+    "noise": "/Users/anna-lena/Desktop/work/phd_courses/ml4ls/LatentSpace_data/noise_restacked.mrc",
+    "star": "/Users/anna-lena/Desktop/work/phd_courses/ml4ls/LatentSpace_data/tam_dimer_tetramer/J599_split_0_exported.star"
+  },
+  "schema_version": 2,
+  "star_recentering": true,
+  "translation_convention": "+(OriginYAngst, OriginXAngst)/pixel_size in array axes",
+  "translation_interpolation": "cubic order=3, reflect boundary",
+  "noise_translation": "particle offsets assigned cyclically as preprocessing control; not fitted noise alignment",
+  "rotations_applied": false,
+  "ctf_correction_applied": false
+}

@@ -127,26 +127,72 @@ def save_clustering(root,name,result,*,arrays=None,parent_pca=None):
     return folder
 
 
-def load_clustering(root,name,directory=None):
-    root=Path(root).resolve()
+def load_clustering(root, name, directory=None):
+    root = Path(root).resolve()
     if directory is None:
-        index=root/'clustering_index.json';entries=json.loads(index.read_text()) if index.exists() else {}
-        if name not in entries:raise FileNotFoundError(f'No saved result {name!r}. Saved names: {list(entries)}')
-        directory=entries[name]
-    folder=Path(directory)
-    if not folder.is_absolute():folder=root/folder
-    settings=json.loads((folder/'settings.json').read_text())
-    if settings['schema_version']!=1 or settings['name']!=name:raise ValueError('Clustering checkpoint name/version mismatch')
-    table=pd.read_json(folder/'table.json',orient='table')
-    bundle=load_input_bundle(root,settings['input_source'],settings['input_directory'])
-    if bundle is None and settings.get('input_bundle_settings') is not None:
-        bundle={'settings':settings['input_bundle_settings']}
-    registry={}
-    result=register_clustering_result(registry,name,table,input_source=settings['input_source'],
-        input_directory=Path(settings['input_directory']),input_bundle=bundle,parameters=settings['parameters'])
-    result['checkpoint_directory']=folder
-    result['parent_pca']=settings.get('parent_pca')
-    with np.load(folder/'arrays.npz',allow_pickle=False) as f:result['arrays']={k:f[k].copy() for k in f.files}
+        index = root / "clustering_index.json"
+        entries = json.loads(index.read_text()) if index.exists() else {}
+
+        if name not in entries:
+            raise FileNotFoundError(
+                f"No saved result {name!r}. Saved names: {list(entries)}")
+        directory = entries[name]
+
+    folder = Path(directory)
+    if not folder.is_absolute():
+        folder = root / folder
+    elif not folder.exists():
+        folder = root / folder.name
+
+    if not folder.exists():
+        raise FileNotFoundError(f"Clustering folder not found: {folder}")
+
+    settings = json.loads((folder / "settings.json").read_text())
+    if settings["schema_version"] != 1 or settings["name"] != name:
+        raise ValueError("Clustering checkpoint name/version mismatch")
+
+    table_path = folder / "table.json"
+    if table_path.exists():
+        table = pd.read_json(table_path, orient="table")
+    else:
+        table = pd.read_csv(folder / "table.csv")
+
+    input_directory = Path(settings["input_directory"])
+    if not input_directory.exists():
+        input_directory = root / input_directory.name
+
+    bundle = None
+    bundle_error = None
+    if input_directory.exists():
+        try:
+            bundle = load_input_bundle(
+                root,
+                settings["input_source"],
+                input_directory)
+        except Exception as exc:
+            bundle_error = str(exc)
+
+    if bundle is None and settings.get("input_bundle_settings") is not None:
+        bundle = {"settings": settings["input_bundle_settings"]}
+
+    registry = {}
+    result = register_clustering_result(
+        registry,
+        name,
+        table,
+        input_source=settings["input_source"],
+        input_directory=input_directory,
+        input_bundle=bundle,
+        parameters=settings["parameters"])
+    result["checkpoint_directory"] = folder
+    result["parent_pca"] = settings.get("parent_pca")
+    result["bundle_error"] = bundle_error
+
+    with np.load(folder / "arrays.npz", allow_pickle=False) as f:
+        result["arrays"] = {
+            key: f[key].copy()
+            for key in f.files}
+
     return result
 
 
