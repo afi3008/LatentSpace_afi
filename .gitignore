@@ -1,0 +1,9 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+outputs/pca_nfv9wh6d/display.npz
+movies/dimer.mov
+movies/dimer.mp4
+movies/dimer_small.mov
+movies/output.mov
+movies/tetramer.mov
