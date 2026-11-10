@@ -33,16 +33,23 @@ left_col, title_col, right_col = st.columns(
     vertical_alignment="center"
 )
 
-video_path = "movies/dimer_small.webm"
-video_path_1 = "movies/tetramer_small.webm"
+# Locate videos relative to this Python file
+APP_DIR = Path(__file__).resolve().parent
 
-with open(video_path, "rb") as f:
-    video_bytes = f.read()
-with open(video_path_1, "rb") as f:
-    video_bytes_1 = f.read()
-    
-video_base64 = base64.b64encode(video_bytes).decode("utf-8")
-video_base64_1 = base64.b64encode(video_bytes_1).decode("utf-8")
+video_path = APP_DIR / "movies" / "dimer_small.webm"
+video_path_1 = APP_DIR / "movies" / "tetramer_small.webm"
+
+# Display dimer video
+if video_path.exists():
+    st.video(video_path.read_bytes(), format="video/webm")
+else:
+    st.warning(f"Dimer video not found: {video_path}")
+
+# Display tetramer video
+if video_path_1.exists():
+    st.video(video_path_1.read_bytes(), format="video/webm")
+else:
+    st.warning(f"Tetramer video not found: {video_path_1}")
 
 video_html = f"""
 <video width="100%" autoplay loop muted playsinline
