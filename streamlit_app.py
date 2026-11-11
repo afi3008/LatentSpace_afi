@@ -1,4 +1,6 @@
 from pathlib import Path
+import base64
+
 import io
 import json
 import zipfile
@@ -6,6 +8,7 @@ import zipfile
 import numpy as np
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 import plotly.express as px
 
 from PIL import Image
@@ -15,73 +18,123 @@ from sklearn.cluster import KMeans, DBSCAN
 from sklearn.metrics import pairwise_distances
 
 
+# =========================================================
+# PAGE CONFIGURATION
+# =========================================================
+
+
 st.set_page_config(
     page_title="Cryo-EM particle explorer",
     page_icon="🔬",
     layout="wide",
 )
 
+
+APP_DIR = Path(__file__).resolve().parent
+
 st.title("Cryo-EM particle explorer")
 
 st.caption(
-    "Explore particle representations, clustering and representative images. "
+    "Explore particle representations, clustering and representative images."
 )
 
+
+# =========================================================
+# HEADER VIDEOS
+# =========================================================
+
+def make_video_html(video_path):
+    """Create an autoplaying, looping video player."""
+
+    if not video_path.exists():
+        return f"""
+        <div style="text-align:center; padding:20px;">
+            <p>Video not found: {video_path.name}</p>
+        </div>
+        """
+
+    with open(video_path, "rb") as f:
+        video_base64 = base64.b64encode(f.read()).decode("utf-8")
+
+    return f"""
+    <video
+        autoplay
+        loop
+        muted
+        playsinline
+        controls
+        style="
+            width: 100%;
+            height: 220px;
+            object-fit: contain;
+            background-color: transparent;
+        "
+    >
+        <source
+            src="data:video/webm;base64,{video_base64}"
+            type="video/webm"
+        >
+    </video>
+    """
+
+
+video_path = APP_DIR / "movies" / "dimer_small.webm"
+video_path_1 = APP_DIR / "movies" / "tetramer_small.webm"
+
+video_html = make_video_html(video_path)
+video_html_1 = make_video_html(video_path_1)
 
 left_col, title_col, right_col = st.columns(
     [1, 2, 1],
-    vertical_alignment="center"
+    vertical_alignment="center",
 )
 
-video_path = "movies/dimer_small.webm"
-video_path_1 = "movies/tetramer_small.webm"
-
-with open(video_path, "rb") as f:
-    video_bytes = f.read()
-with open(video_path_1, "rb") as f:
-    video_bytes_1 = f.read()
-    
-video_base64 = base64.b64encode(video_bytes).decode("utf-8")
-video_base64_1 = base64.b64encode(video_bytes_1).decode("utf-8")
-
-video_html = f"""
-<video width="100%" autoplay loop muted playsinline
-    style="background: transparent;">
-    <source src="data:video/mp4;base64,{video_base64}" type="video/webm">
-    Your browser does not support this video.
-</video>
-"""
-
-video_html_1 = f"""
-<video width="100%" autoplay loop muted playsinline
-    style="background: transparent;">
-    <source src="data:video/mp4;base64,{video_base64_1}" type="video/webm">
-    Your browser does not support this video.
-</video>
-"""
-
 with left_col:
-    components.html(video_html, height=280)
+    components.html(
+        video_html,
+        height=240,
+        scrolling=False,
+    )
 
 with title_col:
     st.markdown(
-        "<h1 style='text-align:center;'>Is it a dimer or a tetramer?</h1>",
-        unsafe_allow_html=True
+        """
+        <h1 style="
+            text-align: center;
+            font-size: 2.3rem;
+            line-height: 1.2;
+        ">
+            Is it a dimer or a tetramer?
+        </h1>
+        """,
+        unsafe_allow_html=True,
     )
 
 with right_col:
-    components.html(video_html_1, height=280)
+    components.html(
+        video_html_1,
+        height=240,
+        scrolling=False,
+    )
 
 
 st.write(
-    "Here, we want to differentiate between dimer and tetramer of a protein directly from cryo-EM images. Below is our workflow:"
+    "Here, we want to differentiate between dimer and tetramer "
+    "of a protein directly from cryo-EM images. Below is our workflow:"
 )
 
-st.image("images/workflow_ml4ls.png")
+workflow_path = APP_DIR / "images" / "workflow_ml4ls.png"
 
-# ---------------------------------------------------------
-# Image utilities
-# ---------------------------------------------------------
+if workflow_path.exists():
+    st.image(str(workflow_path), use_container_width=True)
+else:
+    st.warning("Workflow image not found.")
+
+
+# =========================================================
+# IMAGE UTILITIES
+# =========================================================
+
 
 def image_from_array(array):
     array = np.asarray(array)
@@ -90,6 +143,7 @@ def image_from_array(array):
         side = int(np.sqrt(array.size))
         if side * side != array.size:
             return None
+
         array = array.reshape(side, side)
 
     if array.ndim == 3 and array.shape[0] in (1, 3, 4):
@@ -161,9 +215,11 @@ def find_image(images, name):
     )
 
 
+
 # ---------------------------------------------------------
 # Feature analysis utilities
 # ---------------------------------------------------------
+
 
 def numeric_matrix(dataframe, excluded):
     columns = [
@@ -318,14 +374,17 @@ def plot_embedding(embedding, labels, particle_ids, title):
     st.plotly_chart(figure, use_container_width=True)
 
 
+
 # ---------------------------------------------------------
 # Saved-results utilities
 # ---------------------------------------------------------
 
+
 def find_outputs_folder():
     """Find outputs in the current directory or one of its parents."""
 
-    for path in (Path.cwd(), *Path.cwd().parents):
+
+    for path in (APP_DIR, *APP_DIR.parents, Path.cwd(), *Path.cwd().parents):
         candidate = path / "outputs"
 
         if candidate.is_dir():
@@ -405,9 +464,11 @@ def load_saved_run(outputs_folder, run_name):
     }
 
 
+
 # ---------------------------------------------------------
 # Sidebar
 # ---------------------------------------------------------
+
 
 with st.sidebar:
     st.header("Data")
@@ -1170,3 +1231,4 @@ else:
 
     except Exception as error:
         st.error(f"Could not load saved clustering run: {error}")
+

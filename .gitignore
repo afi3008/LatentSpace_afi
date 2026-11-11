@@ -1,3 +1,4 @@
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -218,3 +219,13 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+.DS_Store
+*.py[cod]
+outputs/pca_nfv9wh6d/display.npz
+movies/dimer.mov
+movies/dimer.mp4
+movies/dimer_small.mov
+movies/output.mov
+movies/tetramer.mov
+

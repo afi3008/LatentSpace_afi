@@ -76,28 +76,70 @@ def save_pca(root, namespace):
     return folder
 
 
-def restore_pca(namespace,root,directory=None):
-    folder=resolve(root,directory,'latest_pca.json');settings=json.loads((folder/'settings.json').read_text())
-    if settings['schema_version']!=1:raise ValueError('Unsupported PCA checkpoint version')
-    model=PCA(whiten=settings['whiten'])
-    with np.load(folder/'model.npz',allow_pickle=False) as f:
+
+def restore_pca(namespace, root, directory=None):
+
+    folder = resolve(root, directory, 'latest_pca.json')
+    settings = json.loads((folder / 'settings.json').read_text())
+
+    if settings['schema_version'] != 1:
+        raise ValueError('Unsupported PCA checkpoint version')
+
+    model = PCA(whiten=settings['whiten'])
+
+    with np.load(folder / 'model.npz', allow_pickle=False) as f:
         for key in f.files:
-            value=f[key];setattr(model,key,value.item() if value.ndim==0 else value.copy())
-    scores=np.load(folder/'scores.npy',allow_pickle=False)
-    table=pd.read_json(folder/'table.json',orient='table')
-    if len(scores)!=len(table) or scores.shape[1]!=model.n_components_:raise ValueError('PCA checkpoint dimensions disagree')
-    with np.load(folder/'display.npz',allow_pickle=False) as f:
-        pixels={k:f[k].copy() for k in ('denoised','noise_denoised')}
-        circle=f['circle_mask'].copy();noise=f['noise_indices'].copy()
-    source=settings['input_source'];directory=Path(settings['input_directory'])
-    namespace.update(cwf_pca=model,cwf_pca_embedding=scores,cwf_pca_table=table,
-        cwf_pca_source=source,cwf_loaded_directory=directory,
-        cwf_section3=load_input_bundle(root,source,directory),
-        cwf_pca_input_shape=tuple(settings['input_shape']),cwf_pca_seed=settings['seed'],
-        cwf_pca_components=int(model.n_components_),cwf_pca_noise_indices=noise,
-        cwf_display_pixels=pixels,cwf_circle_mask=circle,
-        cwf_display_description=settings['display_description'],cwf_pca_checkpoint_directory=folder)
-    return folder
+            value = f[key]
+            setattr(
+                model,
+                key,
+                value.item() if value.ndim == 0 else value.copy()
+            )
+
+    scores = np.load(folder / 'scores.npy', allow_pickle=False)
+    table = pd.read_json(folder / 'table.json', orient='table')
+
+    if len(scores) != len(table) or scores.shape[1] != model.n_components_:
+        raise ValueError('PCA checkpoint dimensions disagree')
+
+    # Display data is optional: it can remain local rather than being
+    # uploaded to GitHub.
+    display_path = folder / 'display.npz'
+
+    pixels = None
+    circle = None
+    noise = np.array([], dtype=int)
+
+    if display_path.exists():
+        with np.load(display_path, allow_pickle=False) as f:
+            pixels = {
+                k: f[k].copy()
+                for k in ('denoised', 'noise_denoised')
+            }
+            circle = f['circle_mask'].copy()
+            noise = f['noise_indices'].copy()
+
+    source = settings['input_source']
+    input_directory = Path(settings['input_directory'])
+
+    namespace.update(
+        cwf_pca=model,
+        cwf_pca_embedding=scores,
+        cwf_pca_table=table,
+        cwf_pca_source=source,
+        cwf_loaded_directory=input_directory,
+        cwf_section3=load_input_bundle(root, source, input_directory),
+        cwf_pca_input_shape=tuple(settings['input_shape']),
+        cwf_pca_seed=settings['seed'],
+        cwf_pca_components=int(model.n_components_),
+        cwf_pca_noise_indices=noise,
+        cwf_display_pixels=pixels,
+        cwf_circle_mask=circle,
+        cwf_display_description=settings['display_description'],
+        cwf_pca_checkpoint_directory=folder
+    )
+
+    return folder 
 
 
 def ensure_pca(namespace,root,directory=None):
