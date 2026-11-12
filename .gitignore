@@ -223,6 +223,8 @@ __marimo__/
 .DS_Store
 *.py[cod]
 outputs/pca_nfv9wh6d/display.npz
+outputs/cwf_*
+outputs/paired*
 movies/dimer.mov
 movies/dimer.mp4
 movies/dimer_small.mov
