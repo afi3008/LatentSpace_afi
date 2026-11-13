@@ -166,7 +166,7 @@ def scatter(df, x_label, y_label, title, color=None):
     )
     fig.update_traces(marker=dict(size=7, opacity=0.8))
     fig.update_layout(height=520, margin=dict(l=10, r=10, t=50, b=10))
-    st.plotly_chart(fig, width="stretch"=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 def scatter_cluster(df, x_label, y_label, title, color=None, category_orders=None, color_map=None):
