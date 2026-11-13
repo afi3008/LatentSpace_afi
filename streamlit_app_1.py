@@ -354,7 +354,7 @@ st.download_button(
 st.markdown("##### Validation")
 workflow_path = APP_DIR / "images" / "validation.png"
 if workflow_path.exists():
-    st.image(str(workflow_path), width=100)
+    st.image(str(workflow_path), width=600)
 else:
     st.warning("Validation image not found (images/validation.png).")
 
