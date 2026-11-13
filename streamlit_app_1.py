@@ -51,7 +51,7 @@ with right_col:
 st.markdown("##### Workflow\n\nImage denoising workflow starting from very experimental images without any possibility of differentiation between protein and noise to actually visualizing the particle")
 workflow_path = APP_DIR / "images" / "workflow_ml4ls.png"
 if workflow_path.exists():
-    st.image(str(workflow_path), width="stretch"=True)
+    st.image(str(workflow_path), width="stretch")
 else:
     st.warning("Workflow image not found (images/workflow_ml4ls.png).")
 
