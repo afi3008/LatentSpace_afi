@@ -100,8 +100,25 @@ def load_run(outputs_folder: str, run_name: str):
         raise ValueError("selected_scores and table have different numbers of rows.")
 
     plot = checkpoint / "clusters.png"
-    return scores, table, (str(plot) if plot.exists() else None)
+    return scores, table, (str(plot) if plot.exists() else None), variance_ratio_from(arrays)
 
+def variance_ratio_from(arrays: dict):
+    """Look for a 1-D explained-variance-ratio array."""
+    for key, arr in arrays.items():
+        k = key.lower().replace("_", "")
+        if arr.ndim == 1 and ("explainedvarianceratio" in k or ("variance" in k and "ratio" in k)):
+            return np.asarray(arr, dtype=float)
+    return None
+
+
+@st.cache_data(show_spinner=False)
+def variance_ratio_from_model(folder: str):
+    """Same lookup in model.npz of the PCA output folder."""
+    model = Path(folder) / "model.npz"
+    if not model.exists():
+        return None
+    with np.load(model, allow_pickle=False) as archive:
+        return variance_ratio_from({k: archive[k] for k in archive.files})
 
 def split_run_name(name: str):
     """'PCA kmeans' -> ('PCA', 'kmeans'); returns (None, name) if no method token."""
