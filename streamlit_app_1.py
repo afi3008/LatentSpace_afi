@@ -310,8 +310,20 @@ with ctrl2:
         st.dataframe(counts, use_container_width=True)
 
 with plot2:
-    scatter_cluster(frame(scores2, table2, xi2, yi2), comp_labels[xi2], comp_labels[yi2],
-            f"{run_name}: {comp_labels[xi2]} vs {comp_labels[yi2]}", color="cluster")
+    df2 = frame(scores2, table2, xi2, yi2)
+    order, cmap = None, None
+ 
+    if "dbscan" in algo.lower():
+        # DBSCAN: noise is drawn first = in the background
+        df2 = df2[df2["cluster"].isin(["1", "-1"])]
+        order = {"cluster": ["-1", "1"]}
+        cmap = {"-1": "lightgray", "1": "#1f77b4"}
+        st.caption(f"Showing only cluster 1 and noise (-1): {len(df2):,} of {len(table2):,} particles.")
+ 
+    scatter(df2, axis_label(xi2), axis_label(yi2),
+            f"{run_name}: {comp_labels[xi2]} vs {comp_labels[yi2]}",
+            color="cluster", category_orders=order, color_map=cmap)
+ 
 
 if cluster_png:
     with st.expander("Clustering plot saved by the notebook"):
