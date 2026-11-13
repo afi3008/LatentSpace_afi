@@ -374,3 +374,12 @@ if workflow_path.exists():
     st.image(str(workflow_path), width=800)
 else:
     st.warning("Validation image not found (images/outlook.png).")
+
+st.divider()
+
+st.markdown("##### What remains in the end...")
+workflow_path = APP_DIR / "images" / "fist.png"
+if workflow_path.exists():
+    st.image(str(workflow_path), width="stretch")
+else:
+    st.warning("Validation image not found (images/fist.png).")
