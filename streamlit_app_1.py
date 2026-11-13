@@ -169,9 +169,11 @@ def scatter(df, x_label, y_label, title, color=None):
     st.plotly_chart(fig, use_container_width=True)
 
 
-def scatter_cluster(df, x_label, y_label, title, color=None):
+def scatter_cluster(df, x_label, y_label, title, color=None, category_orders=None, color_map=None):
     fig = px.scatter(
         df, x="x", y="y", color=color,
+        category_orders=category_orders,
+        color_discrete_map=color_map,
         hover_name="particle",
         hover_data={"cluster": True, "x": ":.3f", "y": ":.3f", "particle": False},
         labels={"x": x_label, "y": y_label},
