@@ -260,25 +260,24 @@ with plot:
 # =========================================================
 # SECTION 2: important pixels (saved loadings images)
 # =========================================================
-st.markdown(f"##### {method} important pixels")
+with st.expander(f"{method} important pixels (click to show)"):
+    if not pages:
+        st.info(f"No loadings_XXXX.png files found for {method}.")
+    else:
+        starts = list(pages)
  
-if not pages:
-    st.info(f"No loadings_XXXX.png files found for {method}.")
-else:
-    starts = list(pages)
+        def page_for(i: int) -> int:
+            """Last loadings file whose start index is <= the component index."""
+            return max([s for s in starts if s <= i], default=starts[0])
  
-    def page_for(i: int) -> int:
-        """Last loadings file whose start index is <= the component index."""
-        return max([s for s in starts if s <= i], default=starts[0])
- 
-    # the dropdown opens on the page that contains the selected x component
-    chosen = st.selectbox(
-        "Loadings image",
-        starts,
-        index=starts.index(page_for(xi)),
-        format_func=lambda s: Path(pages[s]).name,
-    )
-    st.image(pages[chosen], caption=Path(pages[chosen]).name, use_container_width=True)
+        # the dropdown opens on the page that contains the selected x component
+        chosen = st.selectbox(
+            "Loadings image",
+            starts,
+            index=starts.index(page_for(xi)),
+            format_func=lambda s: Path(pages[s]).name,
+        )
+        st.image(pages[chosen], caption=Path(pages[chosen]).name, use_container_width=True)
  
 st.divider()
 
