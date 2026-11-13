@@ -322,7 +322,7 @@ with plot2:
         cmap = {"-1": "lightgray", "1": "#1f77b4"}
         st.caption(f"Showing only cluster 1 and noise (-1): {len(df2):,} of {len(table2):,} particles.")
  
-    scatter(df2, axis_label(xi2), axis_label(yi2),
+    scatter_cluster(df2, axis_label(xi2), axis_label(yi2),
             f"{run_name}: {comp_labels[xi2]} vs {comp_labels[yi2]}",
             color="cluster", category_orders=order, color_map=cmap)
  
