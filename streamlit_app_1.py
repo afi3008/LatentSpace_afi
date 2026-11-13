@@ -315,7 +315,17 @@ with ctrl2:
 
 with plot2:
     df2 = frame(scores2, table2, xi2, yi2)
-    order, cmap = None, None
+    cmap = None
+ 
+    def numeric_first(label: str):
+        """Sort key: numeric labels in numeric order."""
+        try:
+            return (0, int(label), "")
+        except ValueError:
+            return (1, 0, label)
+ 
+    # legend order: -1, 0, 1, 2, ... (plain string sorting would give "10" before "2")
+    order = {"cluster": sorted(df2["cluster"].unique(), key=numeric_first)}
  
     if "dbscan" in algo.lower():
         # DBSCAN: noise is drawn first = in the background
