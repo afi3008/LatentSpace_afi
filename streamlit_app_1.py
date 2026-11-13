@@ -350,12 +350,27 @@ st.download_button(
     "text/csv",
 )
 
-
 st.markdown("##### Validation")
-workflow_path = APP_DIR / "images" / "validation.png"
+left_col, right_col = st.columns([1, 1], vertical_alignment="center")
+with left_col:
+    workflow_path = APP_DIR / "images" / "validation.png"
+    if workflow_path.exists():
+        st.image(str(workflow_path), width=600)
+    else:
+        st.warning("Validation image not found (images/validation.png).")
+
+with right_col:
+    workflow_path = APP_DIR / "images" / "validation_1.png"
+    if workflow_path.exists():
+        st.image(str(workflow_path), width=600)
+    else:
+        st.warning("Validation image not found (images/validation_1.png).")
+
+st.divider()
+
+st.markdown("##### Outlook")
+workflow_path = APP_DIR / "images" / "outlook.png"
 if workflow_path.exists():
     st.image(str(workflow_path), width=600)
 else:
-    st.warning("Validation image not found (images/validation.png).")
-
-st.divider()
+    st.warning("Validation image not found (images/outlook.png).")
