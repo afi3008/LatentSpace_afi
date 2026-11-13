@@ -362,15 +362,15 @@ with left_col:
 with right_col:
     workflow_path = APP_DIR / "images" / "validation_1.png"
     if workflow_path.exists():
-        st.image(str(workflow_path), width=600)
+        st.image(str(workflow_path), width=500)
     else:
         st.warning("Validation image not found (images/validation_1.png).")
 
 st.divider()
 
-st.markdown("##### Outlook")
+st.markdown("##### Outlook - selecting templates by hand")
 workflow_path = APP_DIR / "images" / "outlook.png"
 if workflow_path.exists():
-    st.image(str(workflow_path), width=600)
+    st.image(str(workflow_path), width=800)
 else:
     st.warning("Validation image not found (images/outlook.png).")
