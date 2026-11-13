@@ -48,7 +48,7 @@ with title_col:
 with right_col:
     components.html(make_video_html(str(APP_DIR / "movies" / "tetramer_small.webm")), height=240)
 
-st.markdown("##### Workflow")
+st.markdown("##### Workflow\n\nImage denoising workflow")
 workflow_path = APP_DIR / "images" / "workflow_ml4ls.png"
 if workflow_path.exists():
     st.image(str(workflow_path), use_container_width=True)
