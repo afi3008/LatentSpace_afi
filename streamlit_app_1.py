@@ -308,6 +308,8 @@ if (xi2, yi2) != (xi, yi):
 with ctrl2:
     if "cluster" in table2.columns:
         counts = table2["cluster"].value_counts().sort_index().rename("particles")
+        if "dbscan" in algo.lower():
+            counts = counts[counts.index.astype(str).isin(["1", "-1"])]
         st.caption(f"{len(table2):,} particles · cluster sizes (-1 = noise)")
         st.dataframe(counts, use_container_width=True)
 
