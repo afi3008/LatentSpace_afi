@@ -293,7 +293,7 @@ with ctrl2:
 
 run_name = runs[method][algo]
 try:
-    scores2, table2, cluster_png = load_run(str(outputs), run_name)
+    scores2, table2, cluster_png, _ = load_run(str(outputs), run_name)
 except Exception as e:
     st.error(f"Could not load saved run '{run_name}': {e}")
     st.stop()
